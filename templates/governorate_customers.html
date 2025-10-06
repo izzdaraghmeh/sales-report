@@ -1,0 +1,269 @@
+{% extends "base.html" %}
+
+{% block title %}{{ governorate }} - تقرير قسم المبيعات{% endblock %}
+
+{% block content %}
+<!-- Breadcrumb -->
+<nav aria-label="breadcrumb" class="mb-4">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ url_for('index') }}">الرئيسية</a></li>
+        <li class="breadcrumb-item active">{{ governorate }}</li>
+    </ol>
+</nav>
+
+<!-- Header Section -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="bg-gradient-success text-white p-4 rounded-3 shadow">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h1 class="display-6 mb-2">
+                        <i class="bi bi-geo-alt-fill me-3"></i>
+                        محافظة {{ governorate }}
+                    </h1>
+                    <p class="lead mb-0">إدارة العملاء والمحتملين</p>
+                </div>
+                <div class="col-md-4 text-end">
+                    <a href="{{ url_for('add_customer_form', governorate=governorate) }}" 
+                       class="btn btn-light btn-lg">
+                        <i class="bi bi-person-plus me-2"></i>
+                        إضافة عميل/محتمل
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Statistics Cards -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card bg-primary text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4>{{ customers | length }}</h4>
+                        <p class="mb-0">إجمالي العملاء</p>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="bi bi-people fs-1"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card bg-success text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4>
+                            {% set active_customers = 0 %}
+                            {% for customer in customers %}
+                                {% if customer.communication_count > 0 %}
+                                    {% set active_customers = active_customers + 1 %}
+                                {% endif %}
+                            {% endfor %}
+                            {{ active_customers }}
+                        </h4>
+                        <p class="mb-0">عملاء نشطون</p>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="bi bi-chat-dots fs-1"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card bg-warning text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4>
+                            {% set total_communications = 0 %}
+                            {% for customer in customers %}
+                                {% set total_communications = total_communications + customer.communication_count %}
+                            {% endfor %}
+                            {{ total_communications }}
+                        </h4>
+                        <p class="mb-0">تقارير التواصل</p>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="bi bi-telephone fs-1"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card bg-info text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4>{{ governorate }}</h4>
+                        <p class="mb-0">المحافظة</p>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="bi bi-geo-alt fs-1"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Customers List -->
+{% if customers %}
+<div class="row">
+    {% for customer in customers %}
+    <div class="col-lg-6 col-xl-4 mb-4">
+        <div class="card h-100 shadow-sm customer-card" 
+             onclick="window.location.href='{{ url_for('customer_details', customer_id=customer.id) }}'">
+            <div class="card-header bg-light border-bottom-0">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h6 class="mb-0 text-primary">
+                        <i class="bi bi-building me-2"></i>
+                        {{ customer.company_name }}
+                    </h6>
+                    {% if customer.communication_count > 0 %}
+                    <span class="badge bg-success">{{ customer.communication_count }} تقرير</span>
+                    {% else %}
+                    <span class="badge bg-secondary">جديد</span>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="card-body">
+                <div class="mb-3">
+                    {% if customer.contact_person %}
+                    <p class="mb-1">
+                        <i class="bi bi-person text-muted me-2"></i>
+                        <strong>المسؤول:</strong> {{ customer.contact_person }}
+                    </p>
+                    {% endif %}
+                    
+                    {% if customer.address %}
+                    <p class="mb-1">
+                        <i class="bi bi-geo-alt text-muted me-2"></i>
+                        <strong>العنوان:</strong> {{ customer.address }}
+                    </p>
+                    {% endif %}
+                    
+                    {% if customer.mobile1 %}
+                    <p class="mb-1">
+                        <i class="bi bi-phone text-muted me-2"></i>
+                        <strong>الجوال:</strong> {{ customer.mobile1 }}
+                    </p>
+                    {% endif %}
+                </div>
+                
+                <div class="d-flex justify-content-between align-items-center text-muted small">
+                    <span>
+                        <i class="bi bi-calendar me-1"></i>
+                        أنشئ: {{ customer.created_date[:10] if customer.created_date else 'غير محدد' }}
+                    </span>
+                    {% if customer.last_communication %}
+                    <span class="text-success">
+                        <i class="bi bi-chat-dots me-1"></i>
+                        آخر تواصل: {{ customer.last_communication[:10] if customer.last_communication else 'لا يوجد' }}
+                    </span>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="card-footer bg-transparent border-top-0">
+                <div class="d-flex justify-content-between align-items-center">
+                    <small class="text-muted">
+                        <i class="bi bi-clock me-1"></i>
+                        آخر تحديث: {{ customer.last_updated[:16] if customer.last_updated else 'غير محدد' }}
+                    </small>
+                    <div>
+                        <i class="bi bi-arrow-right-circle text-primary fs-5"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- Pagination would go here if needed -->
+
+{% else %}
+<!-- Empty State -->
+<div class="row">
+    <div class="col-12">
+        <div class="card border-0 bg-light">
+            <div class="card-body text-center py-5">
+                <i class="bi bi-people display-1 text-muted mb-3"></i>
+                <h4 class="text-muted mb-3">لا يوجد عملاء في هذه المحافظة بعد</h4>
+                <p class="text-muted mb-4">ابدأ بإضافة أول عميل أو محتمل في محافظة {{ governorate }}</p>
+                <a href="{{ url_for('add_customer_form', governorate=governorate) }}" 
+                   class="btn btn-primary btn-lg">
+                    <i class="bi bi-person-plus me-2"></i>
+                    إضافة أول عميل
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Quick Actions -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card border-0 bg-light">
+            <div class="card-body text-center py-3">
+                <div class="row">
+                    <div class="col-md-4">
+                        <a href="{{ url_for('add_customer_form', governorate=governorate) }}" 
+                           class="btn btn-outline-primary w-100 mb-2">
+                            <i class="bi bi-person-plus me-2"></i>
+                            إضافة عميل جديد
+                        </a>
+                    </div>
+                    <div class="col-md-4">
+                        <button class="btn btn-outline-success w-100 mb-2" 
+                                onclick="window.print()">
+                            <i class="bi bi-printer me-2"></i>
+                            طباعة القائمة
+                        </button>
+                    </div>
+                    <div class="col-md-4">
+                        <a href="{{ url_for('index') }}" class="btn btn-outline-secondary w-100 mb-2">
+                            <i class="bi bi-arrow-right me-2"></i>
+                            العودة للمحافظات
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+// Add hover effects to customer cards
+document.addEventListener('DOMContentLoaded', function() {
+    const cards = document.querySelectorAll('.customer-card');
+    cards.forEach(card => {
+        card.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-3px)';
+            this.style.transition = 'all 0.3s ease';
+            this.style.boxShadow = '0 8px 25px rgba(0,0,0,0.15)';
+        });
+        
+        card.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
+            this.style.boxShadow = '';
+        });
+    });
+});
+</script>
+{% endblock %}
+

@@ -1,0 +1,172 @@
+{% extends "base.html" %}
+
+{% block title %}تحميل ملف - {{ customer.company_name }}{% endblock %}
+
+{% block content %}
+<!-- Breadcrumb -->
+<nav aria-label="breadcrumb" class="mb-4">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ url_for('index') }}">الرئيسية</a></li>
+        <li class="breadcrumb-item"><a href="{{ url_for('governorate_customers', governorate=customer.governorate) }}">{{ customer.governorate }}</a></li>
+        <li class="breadcrumb-item"><a href="{{ url_for('customer_details', customer_id=customer.id) }}">{{ customer.company_name }}</a></li>
+        <li class="breadcrumb-item active">تحميل ملف</li>
+    </ol>
+</nav>
+
+<!-- Header -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="bg-gradient-primary text-white p-4 rounded-3 shadow">
+            <h1 class="display-6 mb-0">
+                <i class="bi bi-cloud-upload me-3"></i>
+                تحميل ملف جديد
+            </h1>
+            <p class="lead mb-0 mt-2">{{ customer.company_name }}</p>
+        </div>
+    </div>
+</div>
+
+<!-- Upload Form -->
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">
+                    <i class="bi bi-file-earmark-arrow-up me-2"></i>
+                    معلومات الملف
+                </h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" enctype="multipart/form-data" id="uploadForm">
+                    <div class="mb-4">
+                        <label for="file" class="form-label">
+                            <i class="bi bi-paperclip me-2"></i>
+                            اختر الملف *
+                        </label>
+                        <input type="file" class="form-control" id="file" name="file" required>
+                        <div class="form-text">
+                            الأنواع المسموحة: PDF, DOC, DOCX, XLS, XLSX, PPT, PPTX, TXT, PNG, JPG, JPEG, GIF
+                            <br>
+                            الحد الأقصى لحجم الملف: 16 ميجابايت
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="file_description" class="form-label">
+                            <i class="bi bi-card-text me-2"></i>
+                            وصف الملف
+                        </label>
+                        <textarea class="form-control" id="file_description" name="file_description" 
+                                rows="3" placeholder="مثال: عرض سعر، عقد، مستندات، صور المنتج..."></textarea>
+                        <div class="form-text">اكتب وصفاً مختصراً للملف لسهولة التعرف عليه لاحقاً</div>
+                    </div>
+                    
+                    <!-- File Preview -->
+                    <div id="filePreview" class="mb-4" style="display: none;">
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                <h6 class="card-title">معاينة الملف:</h6>
+                                <div id="fileInfo"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{{ url_for('customer_details', customer_id=customer.id) }}" 
+                           class="btn btn-outline-secondary me-md-2">
+                            <i class="bi bi-arrow-left me-2"></i>
+                            إلغاء
+                        </a>
+                        <button type="submit" class="btn btn-primary" id="uploadBtn">
+                            <i class="bi bi-cloud-upload me-2"></i>
+                            تحميل الملف
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Upload Guidelines -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card border-info">
+            <div class="card-header bg-info text-white">
+                <h6 class="mb-0">
+                    <i class="bi bi-info-circle me-2"></i>
+                    إرشادات التحميل
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6 class="text-primary">أنواع الملفات المسموحة:</h6>
+                        <ul class="list-unstyled">
+                            <li><i class="bi bi-file-earmark-pdf text-danger me-2"></i>مستندات PDF</li>
+                            <li><i class="bi bi-file-earmark-word text-primary me-2"></i>مستندات Word (DOC, DOCX)</li>
+                            <li><i class="bi bi-file-earmark-excel text-success me-2"></i>جداول Excel (XLS, XLSX)</li>
+                            <li><i class="bi bi-file-earmark-ppt text-warning me-2"></i>عروض PowerPoint (PPT, PPTX)</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h6 class="text-primary">نصائح مهمة:</h6>
+                        <ul class="list-unstyled">
+                            <li><i class="bi bi-check-circle text-success me-2"></i>استخدم أسماء ملفات واضحة</li>
+                            <li><i class="bi bi-check-circle text-success me-2"></i>أضف وصفاً مفيداً للملف</li>
+                            <li><i class="bi bi-check-circle text-success me-2"></i>تأكد من أن الملف لا يحتوي على فيروسات</li>
+                            <li><i class="bi bi-check-circle text-success me-2"></i>الحد الأقصى 16 ميجابايت</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById('file').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    const preview = document.getElementById('filePreview');
+    const fileInfo = document.getElementById('fileInfo');
+    
+    if (file) {
+        const fileSize = (file.size / 1024 / 1024).toFixed(2);
+        const fileName = file.name;
+        const fileType = file.type || 'غير محدد';
+        
+        fileInfo.innerHTML = `
+            <div class="row">
+                <div class="col-md-6">
+                    <strong>اسم الملف:</strong> ${fileName}<br>
+                    <strong>نوع الملف:</strong> ${fileType}
+                </div>
+                <div class="col-md-6">
+                    <strong>حجم الملف:</strong> ${fileSize} ميجابايت<br>
+                    <strong>تاريخ التعديل:</strong> ${new Date(file.lastModified).toLocaleDateString('ar-SA')}
+                </div>
+            </div>
+        `;
+        
+        preview.style.display = 'block';
+        
+        // Check file size
+        if (file.size > 16 * 1024 * 1024) {
+            alert('حجم الملف كبير جداً. الحد الأقصى 16 ميجابايت.');
+            e.target.value = '';
+            preview.style.display = 'none';
+        }
+    } else {
+        preview.style.display = 'none';
+    }
+});
+
+// Upload progress
+document.getElementById('uploadForm').addEventListener('submit', function() {
+    const btn = document.getElementById('uploadBtn');
+    btn.innerHTML = '<i class="bi bi-hourglass-split me-2"></i>جاري التحميل...';
+    btn.disabled = true;
+});
+</script>
+{% endblock %}
+

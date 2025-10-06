@@ -1,0 +1,267 @@
+{% extends "base.html" %}
+
+{% block title %}الإحصائيات - تقرير قسم المبيعات{% endblock %}
+
+{% block content %}
+<!-- Breadcrumb -->
+<nav aria-label="breadcrumb" class="mb-4">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ url_for('index') }}">الرئيسية</a></li>
+        <li class="breadcrumb-item active">الإحصائيات</li>
+    </ol>
+</nav>
+
+<!-- Header Section -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="bg-gradient-info text-white p-4 rounded-3 shadow">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h1 class="display-6 mb-2">
+                        <i class="bi bi-bar-chart me-3"></i>
+                        إحصائيات قسم المبيعات
+                    </h1>
+                    <p class="lead mb-0">تقرير شامل عن أداء المبيعات</p>
+                </div>
+                <div class="col-md-4 text-end">
+                    <div class="text-center">
+                        <h3 class="mb-0">{{ total_customers }}</h3>
+                        <small>إجمالي العملاء</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Main Statistics Cards -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card bg-primary text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h3>{{ total_customers }}</h3>
+                        <p class="mb-0">إجمالي العملاء</p>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="bi bi-people fs-1"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card bg-success text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h3>{{ gov_stats | length }}</h3>
+                        <p class="mb-0">المحافظات</p>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="bi bi-geo-alt fs-1"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card bg-warning text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h3>{{ recent_communications | length }}</h3>
+                        <p class="mb-0">تقارير حديثة</p>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="bi bi-chat-dots fs-1"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card bg-info text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h3>{{ active_customers | length }}</h3>
+                        <p class="mb-0">عملاء نشطون</p>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="bi bi-activity fs-1"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Governorates Statistics -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">
+                    <i class="bi bi-map me-2"></i>
+                    إحصائيات المحافظات
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    {% for stat in gov_stats %}
+                    <div class="col-lg-6 mb-3">
+                        <div class="d-flex justify-content-between align-items-center p-3 border rounded">
+                            <div>
+                                <h6 class="mb-1 text-primary">{{ stat.governorate }}</h6>
+                                <small class="text-muted">{{ stat.count }} عميل</small>
+                            </div>
+                            <div class="text-end">
+                                <div class="progress" style="width: 100px; height: 8px;">
+                                    {% set max_count = gov_stats | map(attribute='count') | max %}
+                                    <div class="progress-bar bg-primary" 
+                                         style="width: {{ (stat.count / max_count * 100) | round(1) if max_count > 0 else 0 }}%"></div>
+                                </div>
+                                <small class="text-muted">
+                                    {{ ((stat.count / total_customers * 100) | round(1)) if total_customers > 0 else 0 }}%
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Communications -->
+<div class="row mb-4">
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-header bg-warning text-dark">
+                <h5 class="mb-0">
+                    <i class="bi bi-clock me-2"></i>
+                    آخر التواصلات
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if recent_communications %}
+                {% for comm in recent_communications %}
+                <div class="d-flex align-items-start mb-3 pb-3 border-bottom">
+                    <div class="flex-shrink-0">
+                        <div class="bg-warning text-dark rounded-circle d-flex align-items-center justify-content-center" 
+                             style="width: 40px; height: 40px;">
+                            <i class="bi bi-chat-dots"></i>
+                        </div>
+                    </div>
+                    <div class="flex-grow-1 ms-3">
+                        <h6 class="mb-1">{{ comm.company_name }}</h6>
+                        <p class="mb-1 text-muted small">{{ comm.communication_details[:100] }}...</p>
+                        <small class="text-muted">
+                            <i class="bi bi-geo-alt me-1"></i>{{ comm.governorate }}
+                            <i class="bi bi-calendar me-1 ms-2"></i>{{ comm.log_date[:16] if comm.log_date else 'غير محدد' }}
+                        </small>
+                    </div>
+                </div>
+                {% endfor %}
+                {% else %}
+                <p class="text-muted text-center py-3">لا توجد تواصلات حديثة</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Most Active Customers -->
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0">
+                    <i class="bi bi-trophy me-2"></i>
+                    العملاء الأكثر نشاطاً
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if active_customers %}
+                {% for customer in active_customers %}
+                <div class="d-flex justify-content-between align-items-center mb-3 pb-3 border-bottom">
+                    <div>
+                        <h6 class="mb-1">{{ customer.company_name }}</h6>
+                        <small class="text-muted">
+                            <i class="bi bi-geo-alt me-1"></i>{{ customer.governorate }}
+                        </small>
+                    </div>
+                    <div class="text-end">
+                        <span class="badge bg-success fs-6">{{ customer.communication_count }}</span>
+                        <small class="d-block text-muted">تقرير</small>
+                    </div>
+                </div>
+                {% endfor %}
+                {% else %}
+                <p class="text-muted text-center py-3">لا توجد بيانات كافية</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="row">
+    <div class="col-12">
+        <div class="card border-0 bg-light">
+            <div class="card-body text-center py-4">
+                <h5 class="text-muted mb-3">
+                    <i class="bi bi-lightning-charge me-2"></i>
+                    إجراءات سريعة
+                </h5>
+                <div class="row">
+                    <div class="col-md-3">
+                        <a href="{{ url_for('index') }}" class="btn btn-outline-primary btn-lg w-100 mb-2">
+                            <i class="bi bi-house-door me-2"></i>
+                            الرئيسية
+                        </a>
+                    </div>
+                    <div class="col-md-3">
+                        <button class="btn btn-outline-success btn-lg w-100 mb-2" 
+                                onclick="window.print()">
+                            <i class="bi bi-printer me-2"></i>
+                            طباعة التقرير
+                        </button>
+                    </div>
+                    <div class="col-md-3">
+                        <button class="btn btn-outline-info btn-lg w-100 mb-2" 
+                                onclick="exportData()">
+                            <i class="bi bi-download me-2"></i>
+                            تصدير البيانات
+                        </button>
+                    </div>
+                    <div class="col-md-3">
+                        <button class="btn btn-outline-warning btn-lg w-100 mb-2" 
+                                onclick="refreshStats()">
+                            <i class="bi bi-arrow-clockwise me-2"></i>
+                            تحديث الإحصائيات
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+function refreshStats() {
+    location.reload();
+}
+
+function exportData() {
+    alert('ميزة تصدير البيانات ستكون متاحة قريباً');
+}
+</script>
+{% endblock %}
+

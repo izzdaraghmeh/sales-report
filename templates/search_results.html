@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+
+{% block title %}نتائج البحث - {{ query }}{% endblock %}
+
+{% block content %}
+<!-- Breadcrumb -->
+<nav aria-label="breadcrumb" class="mb-4">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ url_for('index') }}">الرئيسية</a></li>
+        <li class="breadcrumb-item active">نتائج البحث</li>
+    </ol>
+</nav>
+
+<!-- Header Section -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="bg-gradient-success text-white p-4 rounded-3 shadow">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h1 class="display-6 mb-2">
+                        <i class="bi bi-search me-3"></i>
+                        نتائج البحث
+                    </h1>
+                    <p class="lead mb-0">البحث عن: "{{ query }}"</p>
+                </div>
+                <div class="col-md-4 text-end">
+                    <div class="text-center">
+                        <h3 class="mb-0">{{ customers | length }}</h3>
+                        <small>نتيجة</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Search Results -->
+{% if customers %}
+<div class="row">
+    {% for customer in customers %}
+    <div class="col-lg-6 col-xl-4 mb-4">
+        <div class="card h-100 shadow-sm customer-card" 
+             onclick="window.location.href='{{ url_for('customer_details', customer_id=customer.id) }}'">
+            <div class="card-header bg-light border-bottom-0">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h6 class="mb-0 text-primary">
+                        <i class="bi bi-building me-2"></i>
+                        {{ customer.company_name }}
+                    </h6>
+                    <span class="badge bg-info">{{ customer.governorate }}</span>
+                </div>
+            </div>
+            
+            <div class="card-body">
+                <div class="mb-3">
+                    {% if customer.contact_person %}
+                    <p class="mb-1">
+                        <i class="bi bi-person text-muted me-2"></i>
+                        <strong>المسؤول:</strong> {{ customer.contact_person }}
+                    </p>
+                    {% endif %}
+                    
+                    {% if customer.address %}
+                    <p class="mb-1">
+                        <i class="bi bi-geo-alt text-muted me-2"></i>
+                        <strong>العنوان:</strong> {{ customer.address }}
+                    </p>
+                    {% endif %}
+                    
+                    {% if customer.mobile1 %}
+                    <p class="mb-1">
+                        <i class="bi bi-phone text-muted me-2"></i>
+                        <strong>الجوال:</strong> {{ customer.mobile1 }}
+                    </p>
+                    {% endif %}
+                </div>
+                
+                <div class="d-flex justify-content-between align-items-center text-muted small">
+                    <span>
+                        <i class="bi bi-calendar me-1"></i>
+                        أنشئ: {{ customer.created_date[:10] if customer.created_date else 'غير محدد' }}
+                    </span>
+                    {% if customer.communication_count > 0 %}
+                    <span class="text-success">
+                        <i class="bi bi-chat-dots me-1"></i>
+                        {{ customer.communication_count }} تقرير
+                    </span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<!-- Empty State -->
+<div class="row">
+    <div class="col-12">
+        <div class="card border-0 bg-light">
+            <div class="card-body text-center py-5">
+                <i class="bi bi-search display-1 text-muted mb-3"></i>
+                <h4 class="text-muted mb-3">لا توجد نتائج للبحث</h4>
+                <p class="text-muted mb-4">لم نجد أي عملاء يطابقون البحث "{{ query }}"</p>
+                <a href="{{ url_for('index') }}" class="btn btn-primary btn-lg">
+                    <i class="bi bi-arrow-right me-2"></i>
+                    العودة للرئيسية
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+

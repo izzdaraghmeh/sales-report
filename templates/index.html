@@ -1,0 +1,271 @@
+{% extends "base.html" %}
+
+{% block title %}الرئيسية - تقرير قسم المبيعات{% endblock %}
+
+{% block content %}
+<!-- Header Section -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="bg-gradient-primary text-white p-4 rounded-3 shadow">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h1 class="display-6 mb-2">
+                        <i class="bi bi-map me-3"></i>
+                        المحافظات الفلسطينية
+                    </h1>
+                    <p class="lead mb-0">اختر المحافظة لعرض العملاء والمحتملين</p>
+                </div>
+                <div class="col-md-4 text-end">
+                    <div class="d-flex justify-content-end align-items-center">
+                        <div class="text-center">
+                            <h3 class="mb-0">{{ stats.values() | sum }}</h3>
+                            <small>إجمالي العملاء</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Statistics Cards -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card bg-info text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4>{{ stats.values() | sum }}</h4>
+                        <p class="mb-0">إجمالي العملاء</p>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="bi bi-people fs-1"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card bg-success text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4>{{ governorates | length }}</h4>
+                        <p class="mb-0">المحافظات</p>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="bi bi-geo-alt fs-1"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card bg-warning text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4>
+                            {% set active_govs = 0 %}
+                            {% for gov in governorates %}
+                                {% if stats[gov] > 0 %}
+                                    {% set active_govs = active_govs + 1 %}
+                                {% endif %}
+                            {% endfor %}
+                            {{ active_govs }}
+                        </h4>
+                        <p class="mb-0">محافظات نشطة</p>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="bi bi-activity fs-1"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card bg-primary text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4>{{ moment().format('DD/MM') if moment else '06/10' }}</h4>
+                        <p class="mb-0">تاريخ اليوم</p>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="bi bi-calendar-date fs-1"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Governorates Grid -->
+<div class="row">
+    {% for governorate in governorates %}
+    <div class="col-lg-4 col-md-6 mb-4">
+        <div class="card h-100 shadow-sm governorate-card" 
+             onclick="window.location.href='{{ url_for('governorate_customers', governorate=governorate) }}'">
+            <div class="card-body d-flex flex-column">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <div>
+                        <h5 class="card-title text-primary mb-1">
+                            <i class="bi bi-building me-2"></i>
+                            {{ governorate }}
+                        </h5>
+                        <p class="text-muted mb-0">محافظة {{ governorate }}</p>
+                    </div>
+                    <div class="text-end">
+                        <span class="badge bg-primary fs-6">{{ stats[governorate] }}</span>
+                    </div>
+                </div>
+                
+                <div class="mt-auto">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <small class="text-muted">
+                            <i class="bi bi-people-fill me-1"></i>
+                            {{ stats[governorate] }} عميل
+                        </small>
+                        <div>
+                            <i class="bi bi-arrow-left-circle text-primary fs-5"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Progress Bar -->
+                {% set max_customers = stats.values() | max %}
+                {% if max_customers > 0 %}
+                <div class="progress mt-2" style="height: 4px;">
+                    <div class="progress-bar bg-primary" 
+                         style="width: {{ (stats[governorate] / max_customers * 100) | round(1) }}%"></div>
+                </div>
+                {% endif %}
+            </div>
+            
+            <div class="card-footer bg-transparent border-top-0">
+                <div class="d-flex justify-content-between">
+                    <small class="text-muted">
+                        <i class="bi bi-clock me-1"></i>
+                        آخر تحديث: اليوم
+                    </small>
+                    {% if stats[governorate] > 0 %}
+                    <small class="text-success">
+                        <i class="bi bi-check-circle me-1"></i>
+                        نشط
+                    </small>
+                    {% else %}
+                    <small class="text-muted">
+                        <i class="bi bi-plus-circle me-1"></i>
+                        جديد
+                    </small>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- Quick Actions -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card border-0 bg-light">
+            <div class="card-body text-center py-4">
+                <h5 class="text-muted mb-3">
+                    <i class="bi bi-lightning-charge me-2"></i>
+                    إجراءات سريعة
+                </h5>
+                <div class="row">
+                    <div class="col-md-4">
+                        <a href="{{ url_for('statistics') }}" class="btn btn-outline-primary btn-lg w-100 mb-2">
+                            <i class="bi bi-bar-chart me-2"></i>
+                            عرض الإحصائيات
+                        </a>
+                    </div>
+                    <div class="col-md-4">
+                        <button class="btn btn-outline-success btn-lg w-100 mb-2" 
+                                onclick="document.querySelector('input[name=q]').focus()">
+                            <i class="bi bi-search me-2"></i>
+                            البحث في العملاء
+                        </button>
+                    </div>
+                    <div class="col-md-4">
+                        <button class="btn btn-outline-info btn-lg w-100 mb-2" 
+                                onclick="window.print()">
+                            <i class="bi bi-printer me-2"></i>
+                            طباعة التقرير
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Instructions -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card border-primary">
+            <div class="card-header bg-primary text-white">
+                <h6 class="mb-0">
+                    <i class="bi bi-info-circle me-2"></i>
+                    كيفية الاستخدام
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6 class="text-primary">
+                            <i class="bi bi-1-circle me-2"></i>
+                            اختر المحافظة
+                        </h6>
+                        <p class="text-muted mb-3">اضغط على بطاقة المحافظة لعرض قائمة العملاء</p>
+                        
+                        <h6 class="text-primary">
+                            <i class="bi bi-2-circle me-2"></i>
+                            إضافة عميل جديد
+                        </h6>
+                        <p class="text-muted mb-3">استخدم زر "إضافة عميل/محتمل" لإضافة عميل جديد</p>
+                    </div>
+                    <div class="col-md-6">
+                        <h6 class="text-primary">
+                            <i class="bi bi-3-circle me-2"></i>
+                            تتبع التواصل
+                        </h6>
+                        <p class="text-muted mb-3">أضف تقارير التواصل وتتبع تاريخ كل تحديث</p>
+                        
+                        <h6 class="text-primary">
+                            <i class="bi bi-4-circle me-2"></i>
+                            مراجعة الإحصائيات
+                        </h6>
+                        <p class="text-muted mb-3">استخدم صفحة الإحصائيات لمراقبة الأداء</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+// Add hover effects to governorate cards
+document.addEventListener('DOMContentLoaded', function() {
+    const cards = document.querySelectorAll('.governorate-card');
+    cards.forEach(card => {
+        card.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-5px)';
+            this.style.transition = 'all 0.3s ease';
+        });
+        
+        card.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
+        });
+    });
+});
+</script>
+{% endblock %}
+

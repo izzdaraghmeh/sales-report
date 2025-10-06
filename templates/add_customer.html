@@ -1,0 +1,257 @@
+{% extends "base.html" %}
+
+{% block title %}إضافة عميل جديد - {{ governorate }}{% endblock %}
+
+{% block content %}
+<!-- Breadcrumb -->
+<nav aria-label="breadcrumb" class="mb-4">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ url_for('index') }}">الرئيسية</a></li>
+        <li class="breadcrumb-item"><a href="{{ url_for('governorate_customers', governorate=governorate) }}">{{ governorate }}</a></li>
+        <li class="breadcrumb-item active">إضافة عميل جديد</li>
+    </ol>
+</nav>
+
+<!-- Header Section -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="bg-gradient-primary text-white p-4 rounded-3 shadow">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h1 class="display-6 mb-2">
+                        <i class="bi bi-person-plus me-3"></i>
+                        إضافة عميل/محتمل جديد
+                    </h1>
+                    <p class="lead mb-0">محافظة {{ governorate }}</p>
+                </div>
+                <div class="col-md-4 text-end">
+                    <a href="{{ url_for('governorate_customers', governorate=governorate) }}" 
+                       class="btn btn-light btn-lg">
+                        <i class="bi bi-arrow-right me-2"></i>
+                        العودة للقائمة
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Customer Form -->
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">
+                    <i class="bi bi-form me-2"></i>
+                    بيانات العميل/المحتمل
+                </h5>
+            </div>
+            
+            <div class="card-body">
+                <form method="POST" id="customerForm">
+                    <!-- Company Name -->
+                    <div class="mb-4">
+                        <label for="company_name" class="form-label required">
+                            <i class="bi bi-building me-2"></i>
+                            اسم الشركة/المحل *
+                        </label>
+                        <input type="text" class="form-control form-control-lg" id="company_name" 
+                               name="company_name" required placeholder="أدخل اسم الشركة أو المحل">
+                        <div class="form-text">هذا الحقل مطلوب</div>
+                    </div>
+
+                    <!-- Address -->
+                    <div class="mb-4">
+                        <label for="address" class="form-label">
+                            <i class="bi bi-geo-alt me-2"></i>
+                            العنوان
+                        </label>
+                        <textarea class="form-control" id="address" name="address" rows="2" 
+                                  placeholder="أدخل العنوان التفصيلي"></textarea>
+                    </div>
+
+                    <!-- Contact Person -->
+                    <div class="mb-4">
+                        <label for="contact_person" class="form-label">
+                            <i class="bi bi-person me-2"></i>
+                            اسم المسؤول
+                        </label>
+                        <input type="text" class="form-control" id="contact_person" 
+                               name="contact_person" placeholder="اسم الشخص المسؤول">
+                    </div>
+
+                    <!-- Phone Numbers Row -->
+                    <div class="row mb-4">
+                        <div class="col-md-4">
+                            <label for="mobile1" class="form-label">
+                                <i class="bi bi-phone me-2"></i>
+                                رقم الجوال 1
+                            </label>
+                            <input type="tel" class="form-control" id="mobile1" 
+                                   name="mobile1" placeholder="059xxxxxxx">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="mobile2" class="form-label">
+                                <i class="bi bi-phone me-2"></i>
+                                رقم الجوال 2
+                            </label>
+                            <input type="tel" class="form-control" id="mobile2" 
+                                   name="mobile2" placeholder="059xxxxxxx">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="phone" class="form-label">
+                                <i class="bi bi-telephone me-2"></i>
+                                رقم الهاتف
+                            </label>
+                            <input type="tel" class="form-control" id="phone" 
+                                   name="phone" placeholder="09xxxxxxx">
+                        </div>
+                    </div>
+
+                    <!-- Communication Details -->
+                    <div class="mb-4">
+                        <label for="communication_details" class="form-label">
+                            <i class="bi bi-chat-dots me-2"></i>
+                            تفاصيل التواصل الأولية
+                        </label>
+                        <textarea class="form-control" id="communication_details" 
+                                  name="communication_details" rows="4" 
+                                  placeholder="أدخل تفاصيل التواصل الأولي مع العميل (اختياري)"></textarea>
+                        <div class="form-text">
+                            <i class="bi bi-info-circle me-1"></i>
+                            سيتم تسجيل تاريخ اليوم تلقائياً مع هذا التقرير
+                        </div>
+                    </div>
+
+                    <!-- Form Actions -->
+                    <div class="d-flex justify-content-between">
+                        <a href="{{ url_for('governorate_customers', governorate=governorate) }}" 
+                           class="btn btn-secondary btn-lg">
+                            <i class="bi bi-x-circle me-2"></i>
+                            إلغاء
+                        </a>
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="bi bi-check-circle me-2"></i>
+                            حفظ العميل
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Tips Card -->
+<div class="row mt-4">
+    <div class="col-lg-8 mx-auto">
+        <div class="card border-info">
+            <div class="card-header bg-info text-white">
+                <h6 class="mb-0">
+                    <i class="bi bi-lightbulb me-2"></i>
+                    نصائح لإضافة العميل
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6 class="text-info">
+                            <i class="bi bi-1-circle me-2"></i>
+                            المعلومات الأساسية
+                        </h6>
+                        <ul class="list-unstyled text-muted">
+                            <li><i class="bi bi-check me-2"></i>اسم الشركة/المحل مطلوب</li>
+                            <li><i class="bi bi-check me-2"></i>أضف العنوان التفصيلي</li>
+                            <li><i class="bi bi-check me-2"></i>اسم المسؤول مهم للتواصل</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h6 class="text-info">
+                            <i class="bi bi-2-circle me-2"></i>
+                            معلومات الاتصال
+                        </h6>
+                        <ul class="list-unstyled text-muted">
+                            <li><i class="bi bi-check me-2"></i>أضف رقم جوال واحد على الأقل</li>
+                            <li><i class="bi bi-check me-2"></i>يمكن إضافة أكثر من رقم</li>
+                            <li><i class="bi bi-check me-2"></i>سجل تفاصيل التواصل الأولي</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+// Form validation and enhancements
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('customerForm');
+    const companyNameInput = document.getElementById('company_name');
+    
+    // Auto-focus on company name
+    companyNameInput.focus();
+    
+    // Form validation
+    form.addEventListener('submit', function(e) {
+        const companyName = companyNameInput.value.trim();
+        
+        if (!companyName) {
+            e.preventDefault();
+            alert('يرجى إدخال اسم الشركة/المحل');
+            companyNameInput.focus();
+            return false;
+        }
+    });
+    
+    // Phone number formatting
+    const phoneInputs = document.querySelectorAll('input[type="tel"]');
+    phoneInputs.forEach(input => {
+        input.addEventListener('input', function() {
+            // Remove non-digits
+            let value = this.value.replace(/\D/g, '');
+            
+            // Limit length
+            if (value.length > 10) {
+                value = value.substring(0, 10);
+            }
+            
+            this.value = value;
+        });
+    });
+    
+    // Auto-save draft (optional enhancement)
+    const inputs = form.querySelectorAll('input, textarea');
+    inputs.forEach(input => {
+        input.addEventListener('input', function() {
+            // Save to localStorage as draft
+            const formData = new FormData(form);
+            const data = Object.fromEntries(formData);
+            localStorage.setItem('customerDraft_{{ governorate }}', JSON.stringify(data));
+        });
+    });
+    
+    // Load draft on page load
+    const savedDraft = localStorage.getItem('customerDraft_{{ governorate }}');
+    if (savedDraft) {
+        try {
+            const data = JSON.parse(savedDraft);
+            Object.keys(data).forEach(key => {
+                const input = form.querySelector(`[name="${key}"]`);
+                if (input && data[key]) {
+                    input.value = data[key];
+                }
+            });
+        } catch (e) {
+            console.log('Could not load draft');
+        }
+    }
+    
+    // Clear draft on successful submit
+    form.addEventListener('submit', function() {
+        localStorage.removeItem('customerDraft_{{ governorate }}');
+    });
+});
+</script>
+{% endblock %}
+

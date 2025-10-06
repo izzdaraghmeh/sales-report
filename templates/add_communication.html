@@ -1,0 +1,360 @@
+{% extends "base.html" %}
+
+{% block title %}إضافة تقرير تواصل - {{ customer.company_name }}{% endblock %}
+
+{% block content %}
+<!-- Breadcrumb -->
+<nav aria-label="breadcrumb" class="mb-4">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ url_for('index') }}">الرئيسية</a></li>
+        <li class="breadcrumb-item"><a href="{{ url_for('governorate_customers', governorate=customer.governorate) }}">{{ customer.governorate }}</a></li>
+        <li class="breadcrumb-item"><a href="{{ url_for('customer_details', customer_id=customer.id) }}">{{ customer.company_name }}</a></li>
+        <li class="breadcrumb-item active">إضافة تقرير تواصل</li>
+    </ol>
+</nav>
+
+<!-- Header Section -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="bg-gradient-warning text-dark p-4 rounded-3 shadow">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h1 class="display-6 mb-2">
+                        <i class="bi bi-chat-dots me-3"></i>
+                        إضافة تقرير تواصل جديد
+                    </h1>
+                    <p class="lead mb-0">
+                        <i class="bi bi-building me-2"></i>
+                        {{ customer.company_name }} - {{ customer.governorate }}
+                    </p>
+                </div>
+                <div class="col-md-4 text-end">
+                    <a href="{{ url_for('customer_details', customer_id=customer.id) }}" 
+                       class="btn btn-dark btn-lg">
+                        <i class="bi bi-arrow-right me-2"></i>
+                        العودة للتفاصيل
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Customer Info Summary -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card border-warning">
+            <div class="card-body">
+                <div class="row align-items-center">
+                    <div class="col-md-6">
+                        <h6 class="text-warning mb-1">
+                            <i class="bi bi-building me-2"></i>
+                            {{ customer.company_name }}
+                        </h6>
+                        <p class="text-muted mb-0">
+                            {% if customer.contact_person %}
+                            <i class="bi bi-person me-1"></i>{{ customer.contact_person }}
+                            {% endif %}
+                            {% if customer.mobile1 %}
+                            <i class="bi bi-phone me-1 ms-3"></i>{{ customer.mobile1 }}
+                            {% endif %}
+                        </p>
+                    </div>
+                    <div class="col-md-6 text-end">
+                        <small class="text-muted">
+                            <i class="bi bi-calendar me-1"></i>
+                            تاريخ اليوم: {{ moment().format('DD/MM/YYYY') if moment else '06/10/2025' }}
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Communication Form -->
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card shadow">
+            <div class="card-header bg-warning text-dark">
+                <h5 class="mb-0">
+                    <i class="bi bi-plus-circle me-2"></i>
+                    تقرير التواصل الجديد
+                </h5>
+            </div>
+            
+            <div class="card-body">
+                <form method="POST" id="communicationForm">
+                    <!-- Communication Details -->
+                    <div class="mb-4">
+                        <label for="communication_details" class="form-label required">
+                            <i class="bi bi-chat-text me-2"></i>
+                            تفاصيل التواصل *
+                        </label>
+                        <textarea class="form-control form-control-lg" id="communication_details" 
+                                  name="communication_details" rows="6" required 
+                                  placeholder="أدخل تفاصيل التواصل مع العميل...
+
+مثال:
+- تم الاتصال بالعميل في تمام الساعة 10:00 صباحاً
+- ناقشنا إمكانية التعاون في مشروع جديد
+- العميل مهتم ويطلب عرض سعر مفصل
+- الموعد القادم: الأسبوع المقبل لتقديم العرض
+- ملاحظات: العميل يفضل التواصل عبر الواتساب"></textarea>
+                        <div class="form-text">
+                            <i class="bi bi-info-circle me-1"></i>
+                            سيتم حفظ هذا التقرير مع التاريخ والوقت الحالي تلقائياً
+                        </div>
+                    </div>
+
+                    <!-- Quick Templates -->
+                    <div class="mb-4">
+                        <label class="form-label">
+                            <i class="bi bi-lightning me-2"></i>
+                            قوالب سريعة (اختياري)
+                        </label>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="card border-light">
+                                    <div class="card-body p-2">
+                                        <h6 class="card-title text-success mb-2">
+                                            <i class="bi bi-telephone me-1"></i>
+                                            مكالمة هاتفية
+                                        </h6>
+                                        <button type="button" class="btn btn-sm btn-outline-success w-100" 
+                                                onclick="addTemplate('phone')">
+                                            إضافة قالب المكالمة
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card border-light">
+                                    <div class="card-body p-2">
+                                        <h6 class="card-title text-info mb-2">
+                                            <i class="bi bi-whatsapp me-1"></i>
+                                            رسالة واتساب
+                                        </h6>
+                                        <button type="button" class="btn btn-sm btn-outline-info w-100" 
+                                                onclick="addTemplate('whatsapp')">
+                                            إضافة قالب الواتساب
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row mt-2">
+                            <div class="col-md-6">
+                                <div class="card border-light">
+                                    <div class="card-body p-2">
+                                        <h6 class="card-title text-primary mb-2">
+                                            <i class="bi bi-people me-1"></i>
+                                            اجتماع شخصي
+                                        </h6>
+                                        <button type="button" class="btn btn-sm btn-outline-primary w-100" 
+                                                onclick="addTemplate('meeting')">
+                                            إضافة قالب الاجتماع
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card border-light">
+                                    <div class="card-body p-2">
+                                        <h6 class="card-title text-warning mb-2">
+                                            <i class="bi bi-envelope me-1"></i>
+                                            رسالة إلكترونية
+                                        </h6>
+                                        <button type="button" class="btn btn-sm btn-outline-warning w-100" 
+                                                onclick="addTemplate('email')">
+                                            إضافة قالب الإيميل
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Form Actions -->
+                    <div class="d-flex justify-content-between">
+                        <a href="{{ url_for('customer_details', customer_id=customer.id) }}" 
+                           class="btn btn-secondary btn-lg">
+                            <i class="bi bi-x-circle me-2"></i>
+                            إلغاء
+                        </a>
+                        <button type="submit" class="btn btn-warning btn-lg">
+                            <i class="bi bi-check-circle me-2"></i>
+                            حفظ التقرير
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Tips Card -->
+<div class="row mt-4">
+    <div class="col-lg-8 mx-auto">
+        <div class="card border-success">
+            <div class="card-header bg-success text-white">
+                <h6 class="mb-0">
+                    <i class="bi bi-lightbulb me-2"></i>
+                    نصائح لكتابة تقرير فعال
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6 class="text-success">
+                            <i class="bi bi-check-circle me-2"></i>
+                            معلومات مهمة
+                        </h6>
+                        <ul class="list-unstyled text-muted">
+                            <li><i class="bi bi-arrow-right me-2"></i>وقت ونوع التواصل</li>
+                            <li><i class="bi bi-arrow-right me-2"></i>موضوع المحادثة الرئيسي</li>
+                            <li><i class="bi bi-arrow-right me-2"></i>رد فعل العميل واهتمامه</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h6 class="text-success">
+                            <i class="bi bi-target me-2"></i>
+                            الخطوات التالية
+                        </h6>
+                        <ul class="list-unstyled text-muted">
+                            <li><i class="bi bi-arrow-right me-2"></i>الإجراءات المطلوبة</li>
+                            <li><i class="bi bi-arrow-right me-2"></i>المواعيد المحددة</li>
+                            <li><i class="bi bi-arrow-right me-2"></i>ملاحظات للمتابعة</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+// Communication form enhancements
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('communicationForm');
+    const textarea = document.getElementById('communication_details');
+    
+    // Auto-focus on textarea
+    textarea.focus();
+    
+    // Form validation
+    form.addEventListener('submit', function(e) {
+        const details = textarea.value.trim();
+        
+        if (!details) {
+            e.preventDefault();
+            alert('يرجى إدخال تفاصيل التواصل');
+            textarea.focus();
+            return false;
+        }
+        
+        if (details.length < 10) {
+            e.preventDefault();
+            alert('يرجى إدخال تفاصيل أكثر (على الأقل 10 أحرف)');
+            textarea.focus();
+            return false;
+        }
+    });
+    
+    // Auto-save draft
+    textarea.addEventListener('input', function() {
+        localStorage.setItem('communicationDraft_{{ customer.id }}', this.value);
+    });
+    
+    // Load draft on page load
+    const savedDraft = localStorage.getItem('communicationDraft_{{ customer.id }}');
+    if (savedDraft) {
+        textarea.value = savedDraft;
+    }
+    
+    // Clear draft on successful submit
+    form.addEventListener('submit', function() {
+        localStorage.removeItem('communicationDraft_{{ customer.id }}');
+    });
+});
+
+// Template functions
+function addTemplate(type) {
+    const textarea = document.getElementById('communication_details');
+    const currentTime = new Date().toLocaleTimeString('ar-PS', {hour: '2-digit', minute:'2-digit'});
+    const currentDate = new Date().toLocaleDateString('ar-PS');
+    
+    let template = '';
+    
+    switch(type) {
+        case 'phone':
+            template = `📞 مكالمة هاتفية - ${currentDate} في ${currentTime}
+
+• تم الاتصال بالعميل وتم الرد
+• موضوع المحادثة: 
+• رد فعل العميل: 
+• الاتفاقات المحققة: 
+• الخطوات التالية: 
+• موعد المتابعة: 
+
+ملاحظات إضافية:
+`;
+            break;
+            
+        case 'whatsapp':
+            template = `💬 رسالة واتساب - ${currentDate} في ${currentTime}
+
+• تم إرسال رسالة عبر الواتساب
+• محتوى الرسالة: 
+• رد العميل: 
+• حالة الرسالة: تم الاستلام / تم القراءة
+• الخطوات التالية: 
+
+ملاحظات:
+`;
+            break;
+            
+        case 'meeting':
+            template = `🤝 اجتماع شخصي - ${currentDate} في ${currentTime}
+
+• مكان الاجتماع: 
+• الحضور: 
+• مدة الاجتماع: 
+• النقاط المناقشة: 
+• القرارات المتخذة: 
+• المهام الموزعة: 
+• الاجتماع القادم: 
+
+خلاصة الاجتماع:
+`;
+            break;
+            
+        case 'email':
+            template = `📧 رسالة إلكترونية - ${currentDate} في ${currentTime}
+
+• تم إرسال إيميل إلى: 
+• موضوع الرسالة: 
+• المحتوى الرئيسي: 
+• المرفقات: 
+• رد العميل: 
+• الإجراءات المطلوبة: 
+
+ملاحظات:
+`;
+            break;
+    }
+    
+    if (textarea.value.trim()) {
+        textarea.value += '\n\n' + template;
+    } else {
+        textarea.value = template;
+    }
+    
+    textarea.focus();
+    textarea.scrollTop = textarea.scrollHeight;
+}
+</script>
+{% endblock %}
+

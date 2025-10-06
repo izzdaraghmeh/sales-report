@@ -1,0 +1,167 @@
+{% extends "base.html" %}
+
+{% block title %}تعديل {{ customer.company_name }}{% endblock %}
+
+{% block content %}
+<!-- Breadcrumb -->
+<nav aria-label="breadcrumb" class="mb-4">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ url_for('index') }}">الرئيسية</a></li>
+        <li class="breadcrumb-item"><a href="{{ url_for('governorate_customers', governorate=customer.governorate) }}">{{ customer.governorate }}</a></li>
+        <li class="breadcrumb-item"><a href="{{ url_for('customer_details', customer_id=customer.id) }}">{{ customer.company_name }}</a></li>
+        <li class="breadcrumb-item active">تعديل البيانات</li>
+    </ol>
+</nav>
+
+<!-- Header Section -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="bg-gradient-warning text-dark p-4 rounded-3 shadow">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h1 class="display-6 mb-2">
+                        <i class="bi bi-pencil me-3"></i>
+                        تعديل بيانات العميل
+                    </h1>
+                    <p class="lead mb-0">{{ customer.company_name }} - {{ customer.governorate }}</p>
+                </div>
+                <div class="col-md-4 text-end">
+                    <a href="{{ url_for('customer_details', customer_id=customer.id) }}" 
+                       class="btn btn-dark btn-lg">
+                        <i class="bi bi-arrow-right me-2"></i>
+                        العودة للتفاصيل
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Customer Form -->
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card shadow">
+            <div class="card-header bg-warning text-dark">
+                <h5 class="mb-0">
+                    <i class="bi bi-form me-2"></i>
+                    تعديل بيانات العميل
+                </h5>
+            </div>
+            
+            <div class="card-body">
+                <form method="POST" id="editCustomerForm">
+                    <!-- Company Name -->
+                    <div class="mb-4">
+                        <label for="company_name" class="form-label required">
+                            <i class="bi bi-building me-2"></i>
+                            اسم الشركة/المحل *
+                        </label>
+                        <input type="text" class="form-control form-control-lg" id="company_name" 
+                               name="company_name" required value="{{ customer.company_name }}"
+                               placeholder="أدخل اسم الشركة أو المحل">
+                    </div>
+
+                    <!-- Address -->
+                    <div class="mb-4">
+                        <label for="address" class="form-label">
+                            <i class="bi bi-geo-alt me-2"></i>
+                            العنوان
+                        </label>
+                        <textarea class="form-control" id="address" name="address" rows="2" 
+                                  placeholder="أدخل العنوان التفصيلي">{{ customer.address or '' }}</textarea>
+                    </div>
+
+                    <!-- Contact Person -->
+                    <div class="mb-4">
+                        <label for="contact_person" class="form-label">
+                            <i class="bi bi-person me-2"></i>
+                            اسم المسؤول
+                        </label>
+                        <input type="text" class="form-control" id="contact_person" 
+                               name="contact_person" value="{{ customer.contact_person or '' }}"
+                               placeholder="اسم الشخص المسؤول">
+                    </div>
+
+                    <!-- Phone Numbers Row -->
+                    <div class="row mb-4">
+                        <div class="col-md-4">
+                            <label for="mobile1" class="form-label">
+                                <i class="bi bi-phone me-2"></i>
+                                رقم الجوال 1
+                            </label>
+                            <input type="tel" class="form-control" id="mobile1" 
+                                   name="mobile1" value="{{ customer.mobile1 or '' }}"
+                                   placeholder="059xxxxxxx">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="mobile2" class="form-label">
+                                <i class="bi bi-phone me-2"></i>
+                                رقم الجوال 2
+                            </label>
+                            <input type="tel" class="form-control" id="mobile2" 
+                                   name="mobile2" value="{{ customer.mobile2 or '' }}"
+                                   placeholder="059xxxxxxx">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="phone" class="form-label">
+                                <i class="bi bi-telephone me-2"></i>
+                                رقم الهاتف
+                            </label>
+                            <input type="tel" class="form-control" id="phone" 
+                                   name="phone" value="{{ customer.phone or '' }}"
+                                   placeholder="09xxxxxxx">
+                        </div>
+                    </div>
+
+                    <!-- Form Actions -->
+                    <div class="d-flex justify-content-between">
+                        <a href="{{ url_for('customer_details', customer_id=customer.id) }}" 
+                           class="btn btn-secondary btn-lg">
+                            <i class="bi bi-x-circle me-2"></i>
+                            إلغاء
+                        </a>
+                        <button type="submit" class="btn btn-warning btn-lg">
+                            <i class="bi bi-check-circle me-2"></i>
+                            حفظ التعديلات
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('editCustomerForm');
+    const companyNameInput = document.getElementById('company_name');
+    
+    // Form validation
+    form.addEventListener('submit', function(e) {
+        const companyName = companyNameInput.value.trim();
+        
+        if (!companyName) {
+            e.preventDefault();
+            alert('يرجى إدخال اسم الشركة/المحل');
+            companyNameInput.focus();
+            return false;
+        }
+    });
+    
+    // Phone number formatting
+    const phoneInputs = document.querySelectorAll('input[type="tel"]');
+    phoneInputs.forEach(input => {
+        input.addEventListener('input', function() {
+            let value = this.value.replace(/\D/g, '');
+            if (value.length > 10) {
+                value = value.substring(0, 10);
+            }
+            this.value = value;
+        });
+    });
+});
+</script>
+{% endblock %}
+

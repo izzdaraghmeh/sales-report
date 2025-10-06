@@ -1,0 +1,449 @@
+{% extends "base.html" %}
+
+{% block title %}{{ customer.company_name }} - تفاصيل العميل{% endblock %}
+
+{% block content %}
+<!-- Breadcrumb -->
+<nav aria-label="breadcrumb" class="mb-4">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ url_for('index') }}">الرئيسية</a></li>
+        <li class="breadcrumb-item"><a href="{{ url_for('governorate_customers', governorate=customer.governorate) }}">{{ customer.governorate }}</a></li>
+        <li class="breadcrumb-item active">{{ customer.company_name }}</li>
+    </ol>
+</nav>
+
+<!-- Header Section -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="bg-gradient-info text-white p-4 rounded-3 shadow">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h1 class="display-6 mb-2">
+                        <i class="bi bi-building me-3"></i>
+                        {{ customer.company_name }}
+                    </h1>
+                    <p class="lead mb-0">
+                        <i class="bi bi-geo-alt me-2"></i>
+                        {{ customer.governorate }}
+                        {% if customer.address %}
+                        - {{ customer.address }}
+                        {% endif %}
+                    </p>
+                </div>
+                <div class="col-md-4 text-end">
+                    <div class="btn-group" role="group">
+                        <a href="{{ url_for('edit_customer_form', customer_id=customer.id) }}" 
+                           class="btn btn-light">
+                            <i class="bi bi-pencil me-2"></i>
+                            تعديل
+                        </a>
+                        <a href="{{ url_for('add_communication_form', customer_id=customer.id) }}" 
+                           class="btn btn-warning">
+                            <i class="bi bi-plus-circle me-2"></i>
+                            إضافة تقرير
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Customer Info Cards -->
+<div class="row mb-4">
+    <!-- Basic Info -->
+    <div class="col-lg-6 mb-4">
+        <div class="card h-100">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">
+                    <i class="bi bi-info-circle me-2"></i>
+                    معلومات العميل
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-12 mb-3">
+                        <strong class="text-primary">
+                            <i class="bi bi-building me-2"></i>
+                            اسم الشركة/المحل:
+                        </strong>
+                        <p class="mb-0 mt-1">{{ customer.company_name }}</p>
+                    </div>
+                    
+                    {% if customer.contact_person %}
+                    <div class="col-12 mb-3">
+                        <strong class="text-primary">
+                            <i class="bi bi-person me-2"></i>
+                            المسؤول:
+                        </strong>
+                        <p class="mb-0 mt-1">{{ customer.contact_person }}</p>
+                    </div>
+                    {% endif %}
+                    
+                    {% if customer.address %}
+                    <div class="col-12 mb-3">
+                        <strong class="text-primary">
+                            <i class="bi bi-geo-alt me-2"></i>
+                            العنوان:
+                        </strong>
+                        <p class="mb-0 mt-1">{{ customer.address }}</p>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="col-12">
+                        <strong class="text-primary">
+                            <i class="bi bi-map me-2"></i>
+                            المحافظة:
+                        </strong>
+                        <p class="mb-0 mt-1">{{ customer.governorate }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Contact Info -->
+    <div class="col-lg-6 mb-4">
+        <div class="card h-100">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0">
+                    <i class="bi bi-telephone me-2"></i>
+                    معلومات الاتصال
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if customer.mobile1 %}
+                <div class="mb-3">
+                    <strong class="text-success">
+                        <i class="bi bi-phone me-2"></i>
+                        رقم الجوال 1:
+                    </strong>
+                    <p class="mb-0 mt-1">
+                        <a href="tel:{{ customer.mobile1 }}" class="text-decoration-none">
+                            {{ customer.mobile1 }}
+                        </a>
+                        <a href="https://wa.me/970{{ customer.mobile1[1:] if customer.mobile1.startswith('0') else customer.mobile1 }}" 
+                           target="_blank" class="btn btn-sm btn-outline-success ms-2">
+                            <i class="bi bi-whatsapp"></i>
+                        </a>
+                    </p>
+                </div>
+                {% endif %}
+                
+                {% if customer.mobile2 %}
+                <div class="mb-3">
+                    <strong class="text-success">
+                        <i class="bi bi-phone me-2"></i>
+                        رقم الجوال 2:
+                    </strong>
+                    <p class="mb-0 mt-1">
+                        <a href="tel:{{ customer.mobile2 }}" class="text-decoration-none">
+                            {{ customer.mobile2 }}
+                        </a>
+                        <a href="https://wa.me/970{{ customer.mobile2[1:] if customer.mobile2.startswith('0') else customer.mobile2 }}" 
+                           target="_blank" class="btn btn-sm btn-outline-success ms-2">
+                            <i class="bi bi-whatsapp"></i>
+                        </a>
+                    </p>
+                </div>
+                {% endif %}
+                
+                {% if customer.phone %}
+                <div class="mb-3">
+                    <strong class="text-success">
+                        <i class="bi bi-telephone me-2"></i>
+                        رقم الهاتف:
+                    </strong>
+                    <p class="mb-0 mt-1">
+                        <a href="tel:{{ customer.phone }}" class="text-decoration-none">
+                            {{ customer.phone }}
+                        </a>
+                    </p>
+                </div>
+                {% endif %}
+                
+                {% if not customer.mobile1 and not customer.mobile2 and not customer.phone %}
+                <p class="text-muted text-center py-3">
+                    <i class="bi bi-exclamation-triangle me-2"></i>
+                    لا توجد معلومات اتصال
+                </p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Statistics Row -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card bg-info text-white">
+            <div class="card-body text-center">
+                <h3>{{ communications | length }}</h3>
+                <p class="mb-0">تقارير التواصل</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-primary text-white">
+            <div class="card-body text-center">
+                <h3>{{ customer.created_date[:10] if customer.created_date else 'غير محدد' }}</h3>
+                <p class="mb-0">تاريخ الإضافة</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-success text-white">
+            <div class="card-body text-center">
+                <h3>{{ customer.last_updated[:10] if customer.last_updated else 'غير محدد' }}</h3>
+                <p class="mb-0">آخر تحديث</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-warning text-white">
+            <div class="card-body text-center">
+                <h3>{{ customer.governorate }}</h3>
+                <p class="mb-0">المحافظة</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Communication History -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-warning text-dark d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">
+                    <i class="bi bi-chat-dots me-2"></i>
+                    تاريخ التواصل
+                </h5>
+                <a href="{{ url_for('add_communication_form', customer_id=customer.id) }}" 
+                   class="btn btn-dark btn-sm">
+                    <i class="bi bi-plus-circle me-2"></i>
+                    إضافة تقرير جديد
+                </a>
+            </div>
+            
+            <div class="card-body">
+                {% if communications %}
+                <div class="timeline">
+                    {% for comm in communications %}
+                    <div class="timeline-item mb-4">
+                        <div class="row">
+                            <div class="col-md-2 text-center">
+                                <div class="timeline-date bg-primary text-white rounded p-2">
+                                    <div class="fw-bold">{{ comm.log_date[8:10] if comm.log_date else '00' }}</div>
+                                    <div class="small">{{ comm.log_date[5:7] + '/' + comm.log_date[:4] if comm.log_date else 'غير محدد' }}</div>
+                                </div>
+                                <div class="timeline-time text-muted small mt-1">
+                                    {{ comm.log_date[11:16] if comm.log_date else 'غير محدد' }}
+                                </div>
+                            </div>
+                            <div class="col-md-10">
+                                <div class="card border-start border-primary border-4">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-start mb-2">
+                                            <h6 class="text-primary mb-0">
+                                                <i class="bi bi-chat-text me-2"></i>
+                                                تقرير تواصل #{{ loop.revindex }}
+                                            </h6>
+                                            <small class="text-muted">
+                                                {{ comm.log_date[:16] if comm.log_date else 'غير محدد' }}
+                                            </small>
+                                        </div>
+                                        <p class="mb-0">{{ comm.communication_details }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <!-- Empty State -->
+                <div class="text-center py-5">
+                    <i class="bi bi-chat-dots display-1 text-muted mb-3"></i>
+                    <h5 class="text-muted mb-3">لا توجد تقارير تواصل بعد</h5>
+                    <p class="text-muted mb-4">ابدأ بإضافة أول تقرير تواصل مع هذا العميل</p>
+                    <a href="{{ url_for('add_communication_form', customer_id=customer.id) }}" 
+                       class="btn btn-primary btn-lg">
+                        <i class="bi bi-plus-circle me-2"></i>
+                        إضافة أول تقرير
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card border-0 bg-light">
+            <div class="card-body text-center py-3">
+                <div class="row">
+                    <div class="col-md-3">
+                        <a href="{{ url_for('add_communication_form', customer_id=customer.id) }}" 
+                           class="btn btn-outline-primary w-100 mb-2">
+                            <i class="bi bi-plus-circle me-2"></i>
+                            إضافة تقرير تواصل
+                        </a>
+                    </div>
+                    <div class="col-md-3">
+                        <a href="{{ url_for('edit_customer_form', customer_id=customer.id) }}" 
+                           class="btn btn-outline-warning w-100 mb-2">
+                            <i class="bi bi-pencil me-2"></i>
+                            تعديل البيانات
+                        </a>
+                    </div>
+                    <div class="col-md-3">
+                        <button class="btn btn-outline-success w-100 mb-2" 
+                                onclick="window.print()">
+                            <i class="bi bi-printer me-2"></i>
+                            طباعة التفاصيل
+                        </button>
+                    </div>
+                    <div class="col-md-3">
+                        <a href="{{ url_for('governorate_customers', governorate=customer.governorate) }}" 
+                           class="btn btn-outline-secondary w-100 mb-2">
+                            <i class="bi bi-arrow-right me-2"></i>
+                            العودة للقائمة
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+// Add smooth scrolling and animations
+document.addEventListener('DOMContentLoaded', function() {
+    // Animate timeline items on scroll
+    const timelineItems = document.querySelectorAll('.timeline-item');
+    
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.style.opacity = '1';
+                entry.target.style.transform = 'translateX(0)';
+            }
+        });
+    });
+    
+    timelineItems.forEach(item => {
+        item.style.opacity = '0';
+        item.style.transform = 'translateX(20px)';
+        item.style.transition = 'all 0.5s ease';
+        observer.observe(item);
+    });
+    
+    // Add click-to-call functionality
+    const phoneLinks = document.querySelectorAll('a[href^="tel:"]');
+    phoneLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+            if (!confirm('هل تريد الاتصال بهذا الرقم؟')) {
+                e.preventDefault();
+            }
+        });
+    });
+});
+</script>
+
+<!-- Customer Files Section -->
+<div class="row mt-5">
+    <div class="col-12">
+        <div class="card shadow">
+            <div class="card-header bg-warning text-dark">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="bi bi-folder2-open me-2"></i>
+                        الملفات والمستندات
+                        <span class="badge bg-dark ms-2">{{ files|length }}</span>
+                    </h5>
+                    <a href="{{ url_for('upload_file_form', customer_id=customer.id) }}" 
+                       class="btn btn-dark btn-sm">
+                        <i class="bi bi-cloud-upload me-2"></i>
+                        تحميل ملف جديد
+                    </a>
+                </div>
+            </div>
+            <div class="card-body">
+                {% if files %}
+                    <div class="row">
+                        {% for file in files %}
+                        <div class="col-md-6 col-lg-4 mb-3">
+                            <div class="card border h-100">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-start">
+                                        <div class="file-icon me-3">
+                                            {% set file_ext = file.original_filename.split('.')[-1].lower() %}
+                                            {% if file_ext in ['pdf'] %}
+                                                <i class="bi bi-file-earmark-pdf text-danger fs-2"></i>
+                                            {% elif file_ext in ['doc', 'docx'] %}
+                                                <i class="bi bi-file-earmark-word text-primary fs-2"></i>
+                                            {% elif file_ext in ['xls', 'xlsx'] %}
+                                                <i class="bi bi-file-earmark-excel text-success fs-2"></i>
+                                            {% elif file_ext in ['ppt', 'pptx'] %}
+                                                <i class="bi bi-file-earmark-ppt text-warning fs-2"></i>
+                                            {% elif file_ext in ['jpg', 'jpeg', 'png', 'gif'] %}
+                                                <i class="bi bi-file-earmark-image text-info fs-2"></i>
+                                            {% else %}
+                                                <i class="bi bi-file-earmark text-secondary fs-2"></i>
+                                            {% endif %}
+                                        </div>
+                                        <div class="flex-grow-1">
+                                            <h6 class="card-title mb-1">{{ file.original_filename }}</h6>
+                                            {% if file.file_description %}
+                                                <p class="card-text text-muted small mb-2">{{ file.file_description }}</p>
+                                            {% endif %}
+                                            <div class="small text-muted">
+                                                <i class="bi bi-calendar me-1"></i>
+                                                {{ file.upload_date[:16] if file.upload_date else 'غير محدد' }}
+                                                <br>
+                                                <i class="bi bi-hdd me-1"></i>
+                                                {{ "%.1f"|format(file.file_size / 1024 / 1024) }} ميجابايت
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="mt-3 d-flex gap-2">
+                                        <a href="{{ url_for('download_file', file_id=file.id) }}" 
+                                           class="btn btn-outline-primary btn-sm flex-fill">
+                                            <i class="bi bi-download me-1"></i>
+                                            تحميل
+                                        </a>
+                                        <a href="{{ url_for('delete_file', file_id=file.id) }}" 
+                                           class="btn btn-outline-danger btn-sm"
+                                           onclick="return confirm('هل أنت متأكد من حذف هذا الملف؟')">
+                                            <i class="bi bi-trash me-1"></i>
+                                            حذف
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="text-center py-5">
+                        <i class="bi bi-folder2-open text-muted" style="font-size: 4rem;"></i>
+                        <h5 class="text-muted mt-3">لا توجد ملفات محملة</h5>
+                        <p class="text-muted">قم بتحميل عروض الأسعار والمستندات المهمة</p>
+                        <a href="{{ url_for('upload_file_form', customer_id=customer.id) }}" 
+                           class="btn btn-warning">
+                            <i class="bi bi-cloud-upload me-2"></i>
+                            تحميل أول ملف
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
