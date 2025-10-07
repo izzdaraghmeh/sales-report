@@ -221,11 +221,12 @@ def customer_details(customer_id):
     ''', (customer_id,)).fetchall()
     
     # Get customer files
-    files = conn.execute('''
-        SELECT * FROM customer_files 
-        WHERE customer_id = ? 
-        ORDER BY upload_date DESC
-    ''', (customer_id,)).fetchall()
+    # files = conn.execute('''
+    #     SELECT * FROM customer_files 
+    #     WHERE customer_id = ? 
+    #     ORDER BY upload_date DESC
+    # ''', (customer_id,)).fetchall()
+    files = []  # مؤقتاً حتى يتم إصلاح ميزة الملفات
     
     conn.close()
     return render_template('customer_details.html', 
