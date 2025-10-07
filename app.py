@@ -10,6 +10,12 @@ from werkzeug.utils import secure_filename
 app = Flask(__name__)
 app.secret_key = 'sales_report_secret_key_2024'
 
+from datetime import datetime
+
+@app.context_processor
+def inject_current_date():
+    return {'current_date': datetime.now()}
+
 # File upload configuration
 UPLOAD_FOLDER = 'uploads'
 ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx'}
